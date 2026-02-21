@@ -40,6 +40,15 @@ This template is perfect for teams who need a comprehensive observability soluti
 | `GF_SECURITY_ADMIN_PASSWORD` | Password for the Grafana admin account | Auto-generated secure string |
 | `GF_DEFAULT_INSTANCE_NAME` | Name of your Grafana instance | `Grafana on Railway` |
 | `GF_INSTALL_PLUGINS` | Comma-separated list of Grafana plugins to install | `grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel` |
+| `LOKI_AUTH_SECRET` | Shared secret required by the NGINX proxy in front of Loki (`X-Loki-Auth` header) | Required input |
+
+### Loki is now fronted by NGINX with header auth
+
+Loki traffic is routed through an NGINX proxy service that requires a shared secret in the `X-Loki-Auth` header.
+
+- Set `LOKI_AUTH_SECRET` in Railway (or a local `.env`)
+- Grafana is pre-configured to include `X-Loki-Auth` automatically using that same secret
+- Any external clients should call the NGINX endpoint and include `X-Loki-Auth: <your-secret>`
 
 ### Internal Service URLs
 
