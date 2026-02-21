@@ -17,10 +17,19 @@ services:
       context: ./loki
       dockerfile: dockerfile
     user: root # required for data persistence
-    ports:
-      - "3100:3100"
     volumes:
       - loki_data:/loki
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: dockerfile
+    depends_on:
+      - loki
+    ports:
+      - "3100:8080"
+    environment:
+      - LOKI_AUTH_SECRET=${LOKI_AUTH_SECRET:?LOKI_AUTH_SECRET is required}
 
   tempo: 
     build:
@@ -47,7 +56,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=yourpassword123
       - GF_DEFAULT_INSTANCE_NAME=Grafana
       - GF_INSTALL_PLUGINS=grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel
-      - LOKI_INTERNAL_URL=http://loki:3100
+      - LOKI_INTERNAL_URL=http://nginx:8080
+      - LOKI_AUTH_SECRET=${LOKI_AUTH_SECRET:?LOKI_AUTH_SECRET is required}
       - PROMETHEUS_INTERNAL_URL=http://prometheus:9090
       - TEMPO_INTERNAL_URL=http://tempo:3200
   
